@@ -1,3 +1,15 @@
+.flexed-editor {
+  
+}
+
+.flexed-body {
+  overflow: auto;
+}
+
 .flexed-toolbar button:focus {
   outline: 0;
+}
+
+li.fixed-tool-button.active {
+  text-decoration: underline;
 }

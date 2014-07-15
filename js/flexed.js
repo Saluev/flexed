@@ -8,6 +8,59 @@
     $.fn.flexed = function(userOptions) {
         var options = $.extend({}, $.fn.flexed.defaults, userOptions);
         
+        var create_button = function(button, mode) {
+          var bel;
+          if(mode == 'toolbar') {
+            bel = $(document.createElement('button'));
+            bel.addClass('btn btn-default');
+            bel.attr('data-placement', 'bottom');
+            bel.html(button.caption);
+          } else if(mode == 'dropdown') {
+            bel = $(document.createElement('li'));
+            bel.html('<a href="#">' + button.caption + '</a>');
+          }
+          bel.addClass('flexed-tool-button');
+          
+          bel.attr('title', button.tooltip);
+          bel.attr('data-toggle', 'tooltip');
+          bel.tooltip({html: true, container: 'body'});
+          
+          bel[0].button = button;
+          button.element = bel;
+          
+          if(button.menu) {
+            bel.attr('data-toggle', 'dropdown');
+            bel.addClass('dropdown-toggle');
+            bel.append('&nbsp;<span class="caret"></span>');
+            var new_bel = $(document.createElement('div'));
+            new_bel.addClass('btn-group');
+            new_bel.append(bel);
+            new_bel.append(create_toolbar(button.menu, 'dropdown'));
+            bel = new_bel;
+          }
+          
+          return bel;
+        };
+        
+        var create_toolbar = function(source, mode) {
+          mode = mode || 'toolbar';
+          var container;
+          if(mode == 'toolbar') {
+            container = $(document.createElement('div'));
+            container.addClass('btn-group');
+            container.attr('role', 'toolbar');
+          } else if(mode == 'dropdown') {
+            container = $(document.createElement('ul'));
+            container.addClass('dropdown-menu');
+            container.attr('role', 'menu');
+          }
+          for(var btn_idx in source) {
+            var button = source[btn_idx];
+            container.append(create_button(button, mode));
+          }
+          return container
+        };
+        
         var editor = this;
         var toolbar = $(document.createElement('div'));
         var body = $(document.createElement('div'));
@@ -61,39 +114,25 @@
         for(var panel_idx in panels_list) {
           toolbar.append('&nbsp;');
           var panel = panels_list[panel_idx];
-          var pel = $(document.createElement('div'));
-          if(panel.length > 1)
-            pel.addClass('btn-group flexed-tool-group');
-          for(var btn_idx in panel) {
-            (function(btn_idx) {
-            var button = panel[btn_idx];
-            var bel = $(document.createElement('button'));
-            bel.attr({title: button.tooltip});
-            bel.addClass('btn btn-default flexed-tool-button');
-            bel.html(button.caption);
-            
-            bel.on('click.flexed', function() {
-              button.apply(rangy.getSelection());
-            });
-            
-            button['element'] = bel;
-            pel.append(bel);
-            })(btn_idx);
-          }
-          toolbar.append(pel);
+          toolbar.append(create_toolbar(panel));
         }
         
-        $(".flexed-tool-button", toolbar).tooltip({placement: 'bottom', html: true, container: 'body'});
+        $(".flexed-tool-button", editor).on('click.flexed', function() {
+            var button = this.button;
+            if(!button.apply) return;
+            button.apply(rangy.getSelection());
+        });
         
         editor.on('selectionchange.flexed', function(selection) {
-          for(var btn_idx in buttons_list) {
-            var button = buttons_list[btn_idx];
-            var indication = button.indicate(selection);
-            if(indication)
-              button.element.addClass('active');
-            else
-              button.element.removeClass('active');
-          }
+            $(".flexed-tool-button", editor).each(function(idx, el) {
+                var button = el.button;
+                if(!button.indicate) return;
+                     var indication = button.indicate(selection);
+                if(indication)
+                  button.element.addClass('active');
+                else
+                  button.element.removeClass('active');                             
+            });
         });
         
         var trigger_change = function(ev) {
