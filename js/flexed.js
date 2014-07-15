@@ -83,7 +83,7 @@
           toolbar.append(pel);
         }
         
-        //$(".flexed-tool-button", toolbar).tooltip({placement: 'bottom', html: true});
+        $(".flexed-tool-button", toolbar).tooltip({placement: 'bottom', html: true, container: 'body'});
         
         editor.on('selectionchange.flexed', function(selection) {
           for(var btn_idx in buttons_list) {
