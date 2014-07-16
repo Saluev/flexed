@@ -1,0 +1,3 @@
+[submodule "bootstrap-file-dialog"]
+	path = bootstrap-file-dialog
+	url = https://github.com/Saluev/bootstrap-file-dialog.git

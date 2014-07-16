@@ -79,6 +79,7 @@
         editor.html('');
         editor.append(toolbar);
         editor.append(body);
+        editor.body = body;
         
         toolbar.addClass("flexed-toolbar panel-heading");
         toolbar.css('width', editor.css('width'));
@@ -97,7 +98,7 @@
         
         var suite = options.suite;
         
-        var panels = {};
+        /*var panels = {};
         var panels_list = [];
         var buttons_list = [];
         for(var btn_idx in suite) {
@@ -109,7 +110,9 @@
           }
           panels[group].push(button);
           buttons_list.push(button);
-        }
+        }*/
+        
+        var panels_list = suite;
         
         for(var panel_idx in panels_list) {
           toolbar.append('&nbsp;');
@@ -120,7 +123,7 @@
         $(".flexed-tool-button", editor).on('click.flexed', function() {
             var button = this.button;
             if(!button.apply) return;
-            button.apply(rangy.getSelection());
+            button.apply(rangy.getSelection(), editor);
         });
         
         editor.on('selectionchange.flexed', function(selection) {

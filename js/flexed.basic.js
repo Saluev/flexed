@@ -8,7 +8,7 @@
     var flexed = $.fn.flexed;
     
     flexed.suites.basic = [
-    
+      [
         {
             id: 'font',
             caption: '<span class="glyphicon glyphicon-font"></span>',
@@ -18,7 +18,8 @@
                 // filled in later
             ]
         },
-        
+      ],
+      [
         {
             id: 'bold',
             caption: '<span class="glyphicon aglyphicon-bold"></span>',
@@ -60,7 +61,29 @@
                 return document.queryCommandState('underline');
             }
         }
-        
+      ],
+      [
+        {
+            id: 'image',
+            caption: '<span class="glyphicon aglyphicon-image"></span>',
+            tooltip: 'Image',
+            apply: function apply_image(selection, editor) {
+                var fd = $.FileDialog({accept: 'image/*'});
+                fd.on('files.bs.filedialog', function(ev) {
+                    var files = ev.files;
+                    editor.body.focus();
+                    for(var file_idx in files) {
+                        var file = files[file_idx];
+                        console.log(file.content);
+                        document.execCommand('insertimage', 0, file.content);
+                    }
+                });
+            }
+            
+            
+            
+        }
+      ]
     ];
     
     var fonts = [
@@ -76,7 +99,7 @@
     for(var font_idx in fonts) {
         var font = fonts[font_idx];
         (function(font) {
-        flexed.suites.basic[0].menu.push({
+        flexed.suites.basic[0][0].menu.push({
             id: font,
             caption: '<span style="font-family:' + font + '">' + font + '</span>',
             apply: function(selection) {
