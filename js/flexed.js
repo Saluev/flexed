@@ -1,3 +1,10 @@
+/**
+ * 
+ * @source: https://github.com/Saluev/flexed/blob/master/js/flexed.js
+ * 
+ * Copyright (C) 2014 Tigran Saluev
+ * 
+ */
 (function($) {
     'use strict';
     

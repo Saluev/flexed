@@ -1,3 +1,10 @@
+/**
+ * 
+ * @source: https://github.com/Saluev/flexed/blob/master/js/flexed.basic.js
+ * 
+ * Copyright (C) 2014 Tigran Saluev
+ * 
+ */
 (function($) {
     'use strict';
     
@@ -6,14 +13,27 @@
     }
     
     var flexed = $.fn.flexed;
+    var apply_template = function(cmd) {
+      var result = function apply(selection) {
+        // TODO case when selection != window.getSelection()
+        document.execCommand(cmd);
+      };
+      return result;
+    };
+    var indicate_template = function(cmd) {
+      var result = function indicate(selection) {
+        return document.queryCommandState(cmd);
+      };
+      return result;
+    };
+    
     
     flexed.suites.basic = [
       [
         {
             id: 'font',
-            caption: '<span class="glyphicon glyphicon-font"></span>',
+            caption: '<i class="fa fa-font"></i>',
             tooltip: 'Font',
-            group: 'basic_formatting',
             menu: [
                 // filled in later
             ]
@@ -22,50 +42,40 @@
       [
         {
             id: 'bold',
-            caption: '<span class="glyphicon aglyphicon-bold"></span>',
+            caption: '<i class="fa fa-bold"></i>',
             tooltip: 'Bold',
-            group: 'basic_formatting',
-            apply: function apply_bold(selection) {
-                // TODO case when selection != window.getSelection()
-                document.execCommand('bold');
-            },
-            indicate: function indicate_bold(selection) {
-                return document.queryCommandState('bold');
-            }
+            apply: apply_template('bold'),
+            indicate: indicate_template('bold'),
         },
  
         {
             id: 'italic',
-            caption: '<span class="glyphicon aglyphicon-italic"></span>',
+            caption: '<i class="fa fa-italic"></i>',
             tooltip: 'Italic',
-            group: 'basic_formatting',
-            apply: function apply_bold(selection) {
-                // TODO case when selection != window.getSelection()
-                document.execCommand('italic');
-            },
-            indicate: function indicate_bold(selection) {
-                return document.queryCommandState('italic');
-            }
+            apply: apply_template('italic'),
+            indicate: indicate_template('italic'),
         },
         
         {
             id: 'underline',
-            caption: '<span class="glyphicon aglyphicon-underline"></span>',
+            caption: '<i class="fa fa-underline"></i>',
             tooltip: 'Underline',
-            group: 'basic_formatting',
-            apply: function apply_bold(selection) {
-                // TODO case when selection != window.getSelection()
-                document.execCommand('underline');
-            },
-            indicate: function indicate_bold(selection) {
-                return document.queryCommandState('underline');
-            }
+            apply: apply_template('underline'),
+            indicate: indicate_template('underline'),
+        },
+        
+        {
+            id: 'strikethrough',
+            caption: '<i class="fa fa-strikethrough"></i">',
+            tooltip: 'Strikethrough',
+            apply: apply_template('strikeThrough'),
+            indicate: indicate_template('strikeThrough'),
         }
       ],
       [
         {
             id: 'image',
-            caption: '<span class="glyphicon aglyphicon-image"></span>',
+            caption: '<i class="fa fa-image"></i>',
             tooltip: 'Image',
             apply: function apply_image(selection, editor) {
                 var fd = $.FileDialog({accept: 'image/*'});
