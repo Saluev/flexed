@@ -70,26 +70,28 @@
         
         var editor = this;
         var toolbar = $(document.createElement('div'));
+        var toolbar_placeholder = $(document.createElement('div'));
         var body = $(document.createElement('div'));
-        
-        if(options.trademark)
-            toolbar.html("<b>flexed</b>&#8482;&nbsp;");
-        body.html(editor.html());
-        
-        editor.addClass("flexed-editor panel panel-default");
-         
-        body.addClass("flexed-body panel-body");
-        body.attr('contentEditable', 'True');
-        body.css('min-height', editor.css('min-height'));
-        editor.css('min-height', null);
-        
-        editor.html('');
-        editor.append(toolbar);
-        editor.append(body);
-        editor.body = body;
         
         toolbar.addClass("flexed-toolbar panel-heading");
         toolbar.css('width', editor.css('width'));
+        if(options.trademark)
+            toolbar.html("<b>flexed</b>&#8482;&nbsp;");
+        
+        body.html(editor.html());
+        body.addClass("flexed-body panel-body");
+        body.attr('contentEditable', 'True');
+        body.css('min-height', editor.css('min-height'));
+        
+        toolbar_placeholder.css('display', 'none');
+        
+        editor.addClass("flexed-editor panel panel-default");
+        editor.css('min-height', null);
+        editor.html('');
+        editor.append(toolbar);
+        editor.append(toolbar_placeholder);
+        editor.append(body);
+        editor.body = body;
         
         // smart toolbar
         $(window).on('scroll.flexed', function() {
@@ -97,9 +99,14 @@
           var offset = toolbar.offset();
           if(offset.top < scrollTop) {
             toolbar.css({position: 'fixed', top: options.toolbarOffset});
+            toolbar_placeholder.css({
+                display: 'inherit',
+                height: toolbar.outerHeight(),
+            });
           }
           if(options.toolbarOffset + scrollTop < editor.offset().top) {
             toolbar.css({position: 'inherit'});
+            toolbar_placeholder.css('display', 'none');
           }
         });
         
