@@ -74,6 +74,37 @@
       ],
       [
         {
+            id: 'justifyleft',
+            caption: '<i class="fa fa-align-left"></i>',
+            tooltip: 'Align left',
+            apply: apply_template('justifyLeft'),
+            indicate: indicate_template('justifyLeft'),
+        },
+        {
+            id: 'justifycenter',
+            caption: '<i class="fa fa-align-center"></i>',
+            tooltip: 'Center',
+            apply: apply_template('justifyCenter'),
+            indicate: indicate_template('justifyCenter'),
+        },
+        {
+            id: 'justifyright',
+            caption: '<i class="fa fa-align-right"></i>',
+            tooltip: 'Align right',
+            apply: apply_template('justifyRight'),
+            indicate: indicate_template('justifyRight'),
+        },
+        {
+            id: 'justifyfull',
+            caption: '<i class="fa fa-align-justify"></i>',
+            tooltip: 'Justify',
+            apply: apply_template('justifyFull'),
+            indicate: indicate_template('justifyFull'),
+        },
+        
+      ],
+      [
+        {
             id: 'image',
             caption: '<i class="fa fa-image"></i>',
             tooltip: 'Image',
