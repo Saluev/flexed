@@ -74,7 +74,7 @@
         var body = $(document.createElement('div'));
         
         toolbar.addClass("flexed-toolbar panel-heading");
-        toolbar.css('width', editor.css('width'));
+        //toolbar.css('width', editor.css('width'));
         if(options.trademark)
             toolbar.html("<b>flexed</b>&#8482;&nbsp;");
         
@@ -98,14 +98,20 @@
           var scrollTop = $(window).scrollTop()
           var offset = toolbar.offset();
           if(offset.top < scrollTop) {
-            toolbar.css({position: 'fixed', top: options.toolbarOffset});
+            var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
+            bw = bw + Number(editor.css('border-right-width').slice(0, -2));
+            toolbar.css({
+                position: 'fixed',
+                top: options.toolbarOffset,
+                width: editor.outerWidth() - bw,
+            });
             toolbar_placeholder.css({
                 display: 'inherit',
                 height: toolbar.outerHeight(),
             });
           }
           if(options.toolbarOffset + scrollTop < editor.offset().top) {
-            toolbar.css({position: 'inherit'});
+            toolbar.css({position: 'inherit', width: 'auto'});
             toolbar_placeholder.css('display', 'none');
           }
         });
