@@ -22,6 +22,17 @@
         else
             this.appendChild(newElement);
     }
+    Node.prototype.getLeafs = function getLeafs() {
+        var self = this;
+        var result = [];
+        if(self.childNodes.length == 0)
+            return [self];
+        for(var child_idx = 0; child_idx < self.childNodes.length; ++child_idx) {
+            var child = self.childNodes[child_idx];
+            result = result.concat(child.getLeafs());
+        }
+        return result;
+    }
     
     
     var wrap_element = function wrap_element(el, tag) {
@@ -31,8 +42,6 @@
     }
     
     var wrap_range = function wrap_range(range, tag) {
-        console.log(range, range.inspect(), range.startContainer === range.endContainer);
-        
         var container = range.commonAncestorContainer;
         var start = range.startContainer, end = range.endContainer;
         
@@ -69,17 +78,11 @@
             return wrap_range(new_range, tag); // TODO return new range
         }
         
-        var process_node = function(node) {
-            if(range.containsNode(node)) {
-                return wrap_element(node, tag);
-            }
-            if(range.intersectsNode(node)) {
-                for(var node_idx = node.childNodes.length - 1; node_idx >= 0; --node_idx) {
-                    process_node(node.childNodes[node_idx]);
-                }
-            }
-        }
-        return process_node(container);
+        var leafs = container.getLeafs().filter(function(node) {
+            return range.containsNode(node);
+        }).forEach(function(node) {
+            wrap_element(node, tag);
+        });
     }
     
     var apply_template = function(tag) {
