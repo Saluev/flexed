@@ -12,27 +12,6 @@
         console.error('flexed: load core script before extensions');
     }
     
-    /* DOM utils */
-    NodeList.prototype.indexOf = Array.prototype.indexOf;
-    Node.prototype.insertAfter = function insertAfter(newElement, refElement) {
-        if(refElement.nextSibling)
-            this.insertBefore(newElement, refElement.nextSibling);
-        else
-            this.appendChild(newElement);
-    }
-    Node.prototype.getLeafs = function getLeafs() {
-        var self = this;
-        var result = [];
-        if(self.childNodes.length == 0)
-            return [self];
-        for(var child_idx = 0; child_idx < self.childNodes.length; ++child_idx) {
-            var child = self.childNodes[child_idx];
-            result = result.concat(child.getLeafs());
-        }
-        return result;
-    }
-    
-    
     var wrap_element = function wrap_element(el, tag) {
         var range = rangy.createRange();
         range.selectNodeContents(el);
