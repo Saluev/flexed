@@ -5,14 +5,12 @@
  * Copyright (C) 2014 Tigran Saluev
  * 
  */
-(function($) {
+(function($, flexed) {
     'use strict';
     
-    if(!$.fn.flexed) {
+    if(!flexed) {
         console.error('flexed: load core script before extensions');
     }
-    
-    var flexed = $.fn.flexed;
     
     /* DOM utils */
     NodeList.prototype.indexOf = Array.prototype.indexOf;
@@ -204,4 +202,4 @@
     
     flexed.defaults.suite = flexed.defaults.suite || flexed.suites.advanced;
     
-})(window.jQuery);
+})(window.jQuery, window.jQuery.fn.flexed);

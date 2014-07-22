@@ -61,10 +61,9 @@
             container.addClass('dropdown-menu');
             container.attr('role', 'menu');
           }
-          for(var btn_idx in source) {
-            var button = source[btn_idx];
+          source.forEach(function(button) {
             container.append(create_button(button, mode));
-          }
+          });
           return container
         };
         
@@ -118,27 +117,10 @@
         
         var suite = options.suite;
         
-        /*var panels = {};
-        var panels_list = [];
-        var buttons_list = [];
-        for(var btn_idx in suite) {
-          var button = suite[btn_idx];
-          var group = button.group;
-          if(!panels[group]) {
-            panels[group] = [];
-            panels_list.push(panels[group]);
-          }
-          panels[group].push(button);
-          buttons_list.push(button);
-        }*/
-        
-        var panels_list = suite;
-        
-        for(var panel_idx in panels_list) {
+        suite.forEach(function(panel) {
           toolbar.append('&nbsp;');
-          var panel = panels_list[panel_idx];
           toolbar.append(create_toolbar(panel));
-        }
+        });
         
         $(".flexed-tool-button", editor).on('click.flexed', function() {
             var button = this.button;
