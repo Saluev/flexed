@@ -96,7 +96,7 @@
         $(window).on('scroll.flexed', function() {
           var scrollTop = $(window).scrollTop()
           var offset = toolbar.offset();
-          if(options.toolbarOffset + offset.top < scrollTop) {
+          if(offset.top < options.toolbarOffset + scrollTop) {
             var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
             bw = bw + Number(editor.css('border-right-width').slice(0, -2));
             toolbar.css({
