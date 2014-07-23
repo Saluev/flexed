@@ -85,7 +85,7 @@
                 throw new Error("flexed.Range: new container and old container don't intersect");
             }
         } else {
-            /* casting rangy.WrappedRange or (?) built-in Range */x
+            /* casting rangy.WrappedRange or (?) built-in Range */
             start = end = 0;
             start_node = range.startContainer;
             end_node = range.endContainer;
@@ -128,9 +128,58 @@
         self.end = end;
     }
     
+    Range.prototype.toRange = function toRange() {
+        var self = this;
+        var result = rangy.createRange();
+        
+        var find_start_or_end = function(result, curr, curr_node, start_or_end) {
+            /* Universal code for finding either start or end    */
+            /* (This function can be moved outside of `toRange`) */
+            while(curr_node.textLength() >= curr) {
+                /* Searching for a child containing selection start or end */
+                var children = curr_node.childNodes, N = children.length;
+                for(var i = 0; i < N; ++i) {
+                    /* Search is reversed when looking for end: */
+                    var child = children[start_or_end ? i : (N - 1 - i)];
+                    var tl = child.textLength();
+                    if(curr >= tl) {
+                        /* Node is shorter than not selected part - skip it */
+                        curr -= tl;
+                    } else {
+                        /* Selection starts or ends inside or on an edge of this node */
+                        curr_node = child;
+                        break;
+                    }
+                }
+                if(curr == 0) {
+                    /* Selection starts or ends on an edge of this node */
+                    start_or_end
+                      ? result.setStartBefore(curr_node)
+                      : result.setEndAfter   (curr_node);
+                    break;
+                } else if(curr_node.nodeType == curr_node.TEXT_NODE) {
+                    /* Selection starts or ends inside this node, *
+                     * and it is a text node: we are done         */
+                    console.assert(curr_node.childNodes.length == 0);
+                    start_or_end
+                      ? result.setStart(curr_node, curr)
+                      : result.setEnd  (curr_node, curr_node.textLength() - curr);
+                    break;
+                } else {
+                    /* Selection starts or ends inside this node;
+                     * recurse deeper */
+                    continue;
+                }
+            }
+        }
+        
+        find_start_or_end(result, self.start, self.container, true );
+        find_start_or_end(result, self.end,   self.container, false);
+        
+        return result;
+    }
     
-    
-    var Selection = function Selection(selection_or_ranges) {
+    var Selection = function Selection(selection_or_ranges, container) {
         var self = this;
         var ranges;
         if(selection_or_ranges instanceof rangy.WrappedRange) {
@@ -153,7 +202,7 @@
             });
             self.nodes = self.nodes.concat(nodes);
         });
-        self.ranges = ranges.map(flexed.createRange);
+        self.ranges = ranges.map(function(range){ return flexed.createRange(range, container); });
     }
     
     Selection.prototype.stripTag = function stripTag(tag) {
@@ -173,7 +222,7 @@
         });
     }
     
-    flexed.createRange = function createRange(range) { return new Range(range); };
+    flexed.createRange = function createRange(r, c) { return new Range(r, c); };
     flexed.Range = Range;
     flexed.Selection = Selection;
     
