@@ -194,23 +194,42 @@
               'rangy.Range or array of ranges'
             );
         }
-        self.nodes = [];
-        ranges.forEach(function(range) {
-            var nodes = range.commonAncestorContainer.getAllNodes().filter(function(node) {
-                /* TODO intersection test */
-                return range.intersectsNode(node) && self.nodes.indexOf(node) < 0;
-            });
-            self.nodes = self.nodes.concat(nodes);
-        });
         self.ranges = ranges.map(function(range){ return flexed.createRange(range, container); });
     }
     
+    /* static function */
+    Selection.selectTag = function selectTag(tag, container) {
+        var jcontainer = container || document;
+        var elements = $(tag, jcontainer); /* jQuery here */
+        /* selecting elements not lying in another elements of the same type: */
+        elements = elements.not($(tag + " " + tag, jcontainer));
+        var ranges = elements.map(function() {
+            var result = rangy.createRange();
+            result.selectNode(this);
+            return result;
+        }).get();
+        return new Selection(ranges, container);
+    }
+    
+    Selection.prototype.getNodes = function getNodes() {
+        var result = [];
+        self.ranges.forEach(function(range) {
+            range = range.toRange();
+            var nodes = range.commonAncestorContainer.getAllNodes().filter(function(node) {
+                return range.intersectsNode(node) && result.indexOf(node) < 0;
+            });
+            result = result.concat(nodes);
+        });
+        return result;
+    }
+    
     Selection.prototype.stripTag = function stripTag(tag) {
+        /* WARNING: this function also strips tags INTERSECTING selection */
         var self = this;
+        var nodes = self.getNodes();
         tag = tag.toUpperCase();
-        self.nodes.forEach(function(node) {
+        nodes.forEach(function(node) {
             if(node.nodeType == node.ELEMENT_NODE && node.tagName.toUpperCase() == tag) {
-                self.nodes.remove(node);
                 var parent = node.parentNode;
                 var children = node.childNodes;
                 Array.prototype.forEach.apply(children, [function(child) {
