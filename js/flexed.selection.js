@@ -58,11 +58,40 @@
         return result;
     }
     
-    var Range = function Range(range) {
+    var Range = function Range(range, container) {
         var self = this;
-        self.container = range.commonAncestorContainer;
-        var start_node = range.startContainer, end_node = range.endContainer;
-        var start = 0, end = 0;
+        var start, end, start_node, end_node;
+        if(range instanceof Range) {
+            if(!container || container === range.container) {
+                /* just copying */
+                self.start = range.start;
+                self.end   = range.end;
+                self.container = range.container;
+                return;
+            }
+            /* copy with container change */
+            if(container.contains(range.container)) {
+                /* new container includes old container */
+                start = range.start;
+                end = range.end;
+                start_node = end_node = range.container;
+                /* now running standard algorithm below */
+            } else if(range.container.contains(container)) {
+                /* old container includes new container */
+                throw new Error("not implemented"); /* TODO: implement/NotImplementedError */
+                return;
+            } else {
+                /* the two containers don't intersect */
+                throw new Error("flexed.Range: new container and old container don't intersect");
+            }
+        } else {
+            /* casting rangy.WrappedRange or (?) built-in Range */x
+            start = end = 0;
+            start_node = range.startContainer;
+            end_node = range.endContainer;
+            container = container || range.commonAncestorContainer;
+        }
+        self.container = container;
         /* computing start */
         if(start_node.nodeType == start_node.TEXT_NODE) {
             start += range.startOffset;
@@ -71,7 +100,7 @@
             for(var i = 0; i < range.startOffset; ++i)
               start += siblings[i].textLength();
         }
-        while(start_node != self.container) {
+        while(start_node != container) {
             var parent = start_node.parentNode;
             var siblings = parent.childNodes;
             var node_idx = siblings.indexOf(start_node);
@@ -88,7 +117,7 @@
             for(var i = range.endOffset; i < siblings.length; ++i)
                 end += siblings[i].textLength();
         }
-        while(end_node != self.container) {
+        while(end_node != container) {
             var parent = end_node.parentNode;
             var siblings = parent.childNodes;
             var node_idx = siblings.indexOf(end_node);
@@ -98,6 +127,8 @@
         }
         self.end = end;
     }
+    
+    
     
     var Selection = function Selection(selection_or_ranges) {
         var self = this;
