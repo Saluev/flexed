@@ -130,7 +130,8 @@
           }
         }
 
-        $(window).on('scroll.flexed', update_toolbars);
+        $(window).on('scroll.flexed resize.flexed', update_toolbars);
+        body.on('input.flexed', update_toolbars); /* TODO keyup, mouseup for old browsers */
         
         var suite = options.suite;
         
@@ -141,8 +142,10 @@
         
         $(".flexed-tool-button", editor).on('click.flexed', function() {
             var button = this.button;
+            this.blur();
             if(!button.apply) return;
             button.apply(rangy.getSelection(), editor);
+            editor.trigger('selectionchange.flexed');
         });
         
         editor.on('selectionchange.flexed', function(selection) {
@@ -164,7 +167,7 @@
         }
         
         body.on('mouseup.flexed keyup.flexed mouseout.flexed', trigger_change);
-        $(window).trigger('scroll.flexed');
+        update_toolbars();
         
     };
     
