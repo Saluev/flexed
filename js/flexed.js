@@ -100,41 +100,31 @@
         editor.append(footer);
         editor.body = body;
         
+        var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
+        bw = bw + Number(editor.css('border-right-width').slice(0, -2));
+        toolbar.css('width', editor.outerWidth() - bw);
+        footer .css('width', editor.outerWidth() - bw);
+        
         // smart toolbar & footer
         var update_toolbars = function() {
-          var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
-          bw = bw + Number(editor.css('border-right-width').slice(0, -2));
-          toolbar_placeholder.css('height', toolbar.outerHeight());
-          footer_placeholder .css('height', footer .outerHeight());
-          toolbar.css('width', editor.outerWidth() - bw);
-          footer .css('width', editor.outerWidth() - bw);
-          
           var scrollTop = $(window).scrollTop()
-          var offset = toolbar_placeholder.offset();
-          if(offset.top < options.toolbarOffset + scrollTop) {
-              toolbar.css('top', options.toolbarOffset);
-              toolbar.addClass('flexed-fixed');
-          }
-          if(options.toolbarOffset + scrollTop < editor.offset().top) {
-              toolbar.css('top', editor.offset().top - scrollTop);
-              toolbar.removeClass('flexed-fixed');
+          var scrollBottom = scrollTop + $(window).height();
+          
+          var editor_offset = editor.offset();
+          var editor_height = editor.height();
+          
+          var editor_top = editor_offset.top;
+          var editor_bottom = editor_offset.top + editor_height;
+          
+          if(options.toolbarOffset >= editor_top - scrollTop) {
+              toolbar.css('top', options.toolbarOffset).addClass('flexed-fixed');
+          } else {
+              toolbar.css('top', editor_top - scrollTop).removeClass('flexed-fixed');
           }
           
-          var scrollBottom = scrollTop + $(window).height();
-          var bottom_lim = scrollBottom - options.footerOffset;
-          offset = footer_placeholder.offset();
-          if(offset.top + footer.outerHeight() > bottom_lim) {
-              footer.css('bottom', options.footerOffset);
-          }
-          var editor_bottom = editor.offset().top + editor.height();
-          if(bottom_lim > editor_bottom) {
-              footer.css('bottom', scrollBottom - editor_bottom);
-          }
+          footer.css('bottom', Math.max(options.footerOffset, scrollBottom - editor_bottom));
         }
 
-        $(window).on('scroll.flexed resize.flexed', update_toolbars);
-        body.on('input.flexed', update_toolbars); /* TODO keyup, mouseup for old browsers */
-        
         var suite   = options.suite;
         var panels  = suite.toolbar || [];
         var actions = suite.actions || [];
@@ -181,6 +171,11 @@
           
         }
         
+        toolbar_placeholder.css('height', toolbar.outerHeight());
+        footer_placeholder .css('height', footer .outerHeight());
+       
+        $(window).on('scroll.flexed resize.flexed', update_toolbars);
+        body.on('input.flexed', update_toolbars); /* TODO keyup, mouseup for old browsers */
         body.on('mouseup.flexed keyup.flexed mouseout.flexed', trigger_change);
         update_toolbars();
         
