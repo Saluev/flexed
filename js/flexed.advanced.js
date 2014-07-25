@@ -80,7 +80,7 @@
     };
     
     
-    flexed.suites.advanced = [
+    var toolbar = [
       [
         {
             id: 'font',
@@ -178,6 +178,10 @@
         }
       ]
     ];
+    
+    flexed.suites.advanced = {
+        toolbar: toolbar
+    };
     
     flexed.defaults.suite = flexed.defaults.suite || flexed.suites.advanced;
     

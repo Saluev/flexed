@@ -27,7 +27,7 @@
     };
     
     
-    flexed.suites.basic = [
+    var toolbar = [
       [
         {
             id: 'font',
@@ -139,7 +139,7 @@
     for(var font_idx in fonts) {
         var font = fonts[font_idx];
         (function(font) {
-        flexed.suites.basic[0][0].menu.push({
+        toolbar[0][0].menu.push({
             id: font,
             caption: '<span style="font-family:' + font + '">' + font + '</span>',
             apply: function(selection) {
@@ -151,6 +151,30 @@
             }
         });
         })(font);
+    }
+    
+    var actions = [
+        [
+            {
+                id: 'save',
+                caption: '<span class="fa fa-save"></span>&nbsp;&nbsp;Save changes',
+                tooltip: '',
+                class: 'btn-primary'
+            }
+        ],
+        [
+            {
+                id: 'discard',
+                caption: '<span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;Discard changes',
+                tooltip: '',
+                class: 'btn-danger',
+            }
+        ]
+    ];
+    
+    flexed.suites.basic = {
+        toolbar: toolbar,
+        actions: actions,
     }
     
     flexed.defaults.suite = flexed.defaults.suite || flexed.suites.basic;

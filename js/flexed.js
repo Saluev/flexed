@@ -15,7 +15,7 @@
     $.fn.flexed = function(userOptions) {
         var options = $.extend({}, $.fn.flexed.defaults, userOptions);
         
-        var create_button = function(button, mode) {
+        var create_button = function(button, mode, btn_class) {
           var bel;
           if(mode == 'toolbar') {
             bel = $(document.createElement('button'));
@@ -26,7 +26,9 @@
             bel = $(document.createElement('li'));
             bel.html('<a href="#">' + button.caption + '</a>');
           }
-          bel.addClass('flexed-tool-button');
+          bel.addClass(btn_class);
+          if(button.class)
+            bel.addClass(button.class);
           
           bel.attr('title', button.tooltip);
           bel.attr('data-toggle', 'tooltip');
@@ -42,14 +44,14 @@
             var new_bel = $(document.createElement('div'));
             new_bel.addClass('btn-group');
             new_bel.append(bel);
-            new_bel.append(create_toolbar(button.menu, 'dropdown'));
+            new_bel.append(create_toolbar(button.menu, 'dropdown', btn_class));
             bel = new_bel;
           }
           
           return bel;
         };
         
-        var create_toolbar = function(source, mode) {
+        var create_toolbar = function(source, mode, btn_class) {
           mode = mode || 'toolbar';
           var container;
           if(mode == 'toolbar') {
@@ -62,7 +64,7 @@
             container.attr('role', 'menu');
           }
           source.forEach(function(button) {
-            container.append(create_button(button, mode));
+            container.append(create_button(button, mode, btn_class));
           });
           return container
         };
@@ -133,11 +135,18 @@
         $(window).on('scroll.flexed resize.flexed', update_toolbars);
         body.on('input.flexed', update_toolbars); /* TODO keyup, mouseup for old browsers */
         
-        var suite = options.suite;
+        var suite   = options.suite;
+        var panels  = suite.toolbar || [];
+        var actions = suite.actions || [];
         
-        suite.forEach(function(panel) {
+        panels.forEach(function(panel) {
             toolbar.append('&nbsp;');
-            toolbar.append(create_toolbar(panel));
+            toolbar.append(create_toolbar(panel, false, 'flexed-tool-button'));
+        });
+        
+        actions.forEach(function(panel) {
+            footer.append('&nbsp;');
+            footer.append(create_toolbar(panel, false, 'flexed-action-button'));
         });
         
         $(".flexed-tool-button", editor).on('click.flexed', function() {
@@ -146,6 +155,12 @@
             if(!button.apply) return;
             button.apply(rangy.getSelection(), editor);
             editor.trigger('selectionchange.flexed');
+        });
+        
+        $(".flexed-action-button", editor).on('click.flexed', function() {
+            var action = this.button;
+            editor.trigger('flexed.' + action.id);
+            this.blur();
         });
         
         editor.on('selectionchange.flexed', function(selection) {
