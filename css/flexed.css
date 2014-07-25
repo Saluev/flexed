@@ -2,12 +2,28 @@
   overflow: visible;
 }
 
+.flexed-toolbar {
+  z-index: 1; /* fixing Chromium outline bug */
+  position: fixed;
+}
+
 .flexed-body {
   overflow: auto;
 }
 
+.flexed-footer {
+  z-index: 1;
+  position: fixed;
+}
+
 .flexed-toolbar button:focus {
   outline: 0;
+}
+.flexed-toolbar:not(.flexed-fixed) {
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-left-radius: 3px;  /* TODO: LESS, Bootstrap standard radius */
+  border-top-right-radius: 3px;
 }
 
 li.fixed-tool-button.active {

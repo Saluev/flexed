@@ -70,19 +70,23 @@
         var editor = this;
         var toolbar = $(document.createElement('div'));
         var toolbar_placeholder = $(document.createElement('div'));
+        var footer = $(document.createElement('div'));
+        var footer_placeholder = $(document.createElement('div'));
         var body = $(document.createElement('div'));
         
         toolbar.addClass("flexed-toolbar panel-heading");
-        //toolbar.css('width', editor.css('width'));
         if(options.trademark)
             toolbar.html("<b>flexed</b>&#8482;&nbsp;");
+        
+        footer.addClass("flexed-footer panel-footer");
         
         body.html(editor.html());
         body.addClass("flexed-body panel-body");
         body.attr('contentEditable', 'True');
         body.css('min-height', editor.css('min-height'));
         
-        toolbar_placeholder.css('display', 'none');
+        toolbar_placeholder.addClass('flexed-toolbar-placeholder');
+        footer_placeholder .addClass('flexed-footer-placeholder');
         
         editor.addClass("flexed-editor panel panel-default");
         editor.css('min-height', null);
@@ -90,36 +94,49 @@
         editor.append(toolbar);
         editor.append(toolbar_placeholder);
         editor.append(body);
+        editor.append(footer_placeholder);
+        editor.append(footer);
         editor.body = body;
         
-        // smart toolbar
-        $(window).on('scroll.flexed', function() {
+        // smart toolbar & footer
+        var update_toolbars = function() {
+          var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
+          bw = bw + Number(editor.css('border-right-width').slice(0, -2));
+          toolbar_placeholder.css('height', toolbar.outerHeight());
+          footer_placeholder .css('height', footer .outerHeight());
+          toolbar.css('width', editor.outerWidth() - bw);
+          footer .css('width', editor.outerWidth() - bw);
+          
           var scrollTop = $(window).scrollTop()
-          var offset = toolbar.offset();
+          var offset = toolbar_placeholder.offset();
           if(offset.top < options.toolbarOffset + scrollTop) {
-            var bw =  Number(editor.css('border-left-width' ).slice(0, -2));
-            bw = bw + Number(editor.css('border-right-width').slice(0, -2));
-            toolbar.css({
-                position: 'fixed',
-                top: options.toolbarOffset,
-                width: editor.outerWidth() - bw,
-            });
-            toolbar_placeholder.css({
-                display: 'inherit',
-                height: toolbar.outerHeight(),
-            });
+              toolbar.css('top', options.toolbarOffset);
+              toolbar.addClass('flexed-fixed');
           }
           if(options.toolbarOffset + scrollTop < editor.offset().top) {
-            toolbar.css({position: 'inherit', width: 'auto'});
-            toolbar_placeholder.css('display', 'none');
+              toolbar.css('top', editor.offset().top - scrollTop);
+              toolbar.removeClass('flexed-fixed');
           }
-        });
+          
+          var scrollBottom = scrollTop + $(window).height();
+          var bottom_lim = scrollBottom - options.footerOffset;
+          offset = footer_placeholder.offset();
+          if(offset.top + footer.outerHeight() > bottom_lim) {
+              footer.css('bottom', options.footerOffset);
+          }
+          var editor_bottom = editor.offset().top + editor.height();
+          if(bottom_lim > editor_bottom) {
+              footer.css('bottom', scrollBottom - editor_bottom);
+          }
+        }
+
+        $(window).on('scroll.flexed', update_toolbars);
         
         var suite = options.suite;
         
         suite.forEach(function(panel) {
-          toolbar.append('&nbsp;');
-          toolbar.append(create_toolbar(panel));
+            toolbar.append('&nbsp;');
+            toolbar.append(create_toolbar(panel));
         });
         
         $(".flexed-tool-button", editor).on('click.flexed', function() {
@@ -147,13 +164,14 @@
         }
         
         body.on('mouseup.flexed keyup.flexed mouseout.flexed', trigger_change);
-        
+        $(window).trigger('scroll.flexed');
         
     };
     
     $.fn.flexed.defaults = {
       trademark: true,
       toolbarOffset: 0,
+      footerOffset: 0,
     };
     
     $.fn.flexed.suites = {};
