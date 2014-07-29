@@ -152,6 +152,9 @@
             var action = this.button;
             editor.trigger('flexed.' + action.id);
             this.blur();
+        }).each(function() {
+            var action = this.button.id;
+            $(this).addClass('flexed-action-' + action);
         });
         
         editor.on('selectionchange.flexed', function(selection) {
