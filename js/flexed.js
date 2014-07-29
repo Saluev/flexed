@@ -12,10 +12,7 @@
       console.error('flexed: rangy (http://code.google.com/p/rangy) is required to work');
     }
     
-    $.fn.flexed = function(userOptions) {
-        var options = $.extend({}, $.fn.flexed.defaults, userOptions);
-        
-        var create_button = function(button, mode, btn_class) {
+    var create_button = function(button, mode, btn_class) {
           var bel;
           if(mode == 'toolbar') {
             bel = $(document.createElement('button'));
@@ -49,9 +46,9 @@
           }
           
           return bel;
-        };
+    };
         
-        var create_toolbar = function(source, mode, btn_class) {
+    var create_toolbar = function(source, mode, btn_class) {
           mode = mode || 'toolbar';
           var container;
           if(mode == 'toolbar') {
@@ -67,7 +64,11 @@
             container.append(create_button(button, mode, btn_class));
           });
           return container
-        };
+    };
+    
+    
+    $.fn.flexed = function(userOptions) {
+        var options = $.extend({}, $.fn.flexed.defaults, userOptions);
         
         var editor = this;
         var toolbar = $(document.createElement('div'));
@@ -125,7 +126,7 @@
           footer.css('bottom', Math.max(options.footerOffset, scrollBottom - editor_bottom));
         }
 
-        var suite   = options.suite;
+        var suite   = options.suite || {};
         var panels  = suite.toolbar || [];
         var actions = suite.actions || [];
         
@@ -179,6 +180,7 @@
         body.on('mouseup.flexed keyup.flexed mouseout.flexed', trigger_change);
         update_toolbars();
         
+        return editor;
     };
     
     $.fn.flexed.defaults = {
