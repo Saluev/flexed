@@ -12,6 +12,8 @@
         console.error('flexed: load core script before extensions');
     }
     
+    var gettext = window.gettext || function(s) { return s; };
+    
     var apply_template = function(cmd) {
       var result = function apply(selection) {
         // TODO case when selection != window.getSelection()
@@ -32,7 +34,7 @@
         {
             id: 'font',
             caption: '<i class="fa fa-font"></i>',
-            tooltip: 'Font',
+            tooltip: gettext('Font'),
             menu: [
                 // filled in later
             ]
@@ -42,7 +44,7 @@
         {
             id: 'bold',
             caption: '<i class="fa fa-bold"></i>',
-            tooltip: 'Bold',
+            tooltip: gettext('Bold'),
             apply: apply_template('bold'),
             indicate: indicate_template('bold'),
         },
@@ -50,7 +52,7 @@
         {
             id: 'italic',
             caption: '<i class="fa fa-italic"></i>',
-            tooltip: 'Italic',
+            tooltip: gettext('Italic'),
             apply: apply_template('italic'),
             indicate: indicate_template('italic'),
         },
@@ -58,7 +60,7 @@
         {
             id: 'underline',
             caption: '<i class="fa fa-underline"></i>',
-            tooltip: 'Underline',
+            tooltip: gettext('Underline'),
             apply: apply_template('underline'),
             indicate: indicate_template('underline'),
         },
@@ -66,7 +68,7 @@
         {
             id: 'strikethrough',
             caption: '<i class="fa fa-strikethrough"></i">',
-            tooltip: 'Strikethrough',
+            tooltip: gettext('Strikethrough'),
             apply: apply_template('strikeThrough'),
             indicate: indicate_template('strikeThrough'),
         }
@@ -75,28 +77,28 @@
         {
             id: 'justifyleft',
             caption: '<i class="fa fa-align-left"></i>',
-            tooltip: 'Align left',
+            tooltip: gettext('Align left'),
             apply: apply_template('justifyLeft'),
             indicate: indicate_template('justifyLeft'),
         },
         {
             id: 'justifycenter',
             caption: '<i class="fa fa-align-center"></i>',
-            tooltip: 'Center',
+            tooltip: gettext('Center'),
             apply: apply_template('justifyCenter'),
             indicate: indicate_template('justifyCenter'),
         },
         {
             id: 'justifyright',
             caption: '<i class="fa fa-align-right"></i>',
-            tooltip: 'Align right',
+            tooltip: gettext('Align right'),
             apply: apply_template('justifyRight'),
             indicate: indicate_template('justifyRight'),
         },
         {
             id: 'justifyfull',
             caption: '<i class="fa fa-align-justify"></i>',
-            tooltip: 'Justify',
+            tooltip: gettext('Justify'),
             apply: apply_template('justifyFull'),
             indicate: indicate_template('justifyFull'),
         },
@@ -106,7 +108,7 @@
         {
             id: 'image',
             caption: '<i class="fa fa-image"></i>',
-            tooltip: 'Image',
+            tooltip: gettext('Image'),
             apply: function apply_image(selection, editor) {
                 var fd = $.FileDialog({accept: 'image/*'});
                 fd.on('files.bs.filedialog', function(ev) {
@@ -157,7 +159,7 @@
         [
             {
                 id: 'save',
-                caption: '<span class="fa fa-save"></span>&nbsp;&nbsp;Save changes',
+                caption: '<span class="fa fa-save"></span>&nbsp;&nbsp;' + gettext('Save changes'),
                 tooltip: '',
                 class: 'btn-primary'
             }
@@ -165,7 +167,7 @@
         [
             {
                 id: 'discard',
-                caption: '<span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;Discard changes',
+                caption: '<span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;' + gettext('Discard changes'),
                 tooltip: '',
                 class: 'btn-danger',
             }
