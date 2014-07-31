@@ -3,7 +3,7 @@
 }
 
 .flexed-toolbar {
-  z-index: 1; /* fixing Chromium outline bug */
+  z-index: 2; /* fixing Chromium outline bug */
   position: fixed;
 }
 
