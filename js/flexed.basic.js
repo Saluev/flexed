@@ -165,7 +165,7 @@
         'Verdana'
     ];
     
-    for(var font_idx in fonts) {
+    for(var font_idx in fonts) { /* TODO: Font detector! */
         var font = fonts[font_idx];
         (function(font) {
         toolbar[0][0].menu.push({

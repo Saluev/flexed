@@ -183,9 +183,8 @@
                 scrollBottom = scrollTop + $(window).height();
             
             var editor_offset = editor.offset(),
-                editor_height = editor.height();
-            
-            var editor_top    = editor_offset.top,
+                editor_height = editor.height(),
+                editor_top    = editor_offset.top,
                 editor_bottom = editor_top + editor_height;
             
             if( options.toolbarOffset >= editor_top - scrollTop ) {

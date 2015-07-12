@@ -179,6 +179,12 @@
         return result;
     }
     
+    Range.prototype.splitBoundaries = function splitBoundaries() {
+        var self = this;
+        var range = self.toRange();
+        range.splitBoundaries();
+    }
+    
     var Selection = function Selection(selection_or_ranges, container) {
         var self = this;
         var ranges;
@@ -239,6 +245,15 @@
                 parent.removeChild(node);
             }
         });
+    }
+    
+    Selection.prototype.intersectsTag = function intersectsTag(tag) {
+        var self = this;
+        return $(self.getNodes()).find(tag).length > 0; // jQuery here
+    }
+    
+    Selection.prototype.wrapTextTag = function wrapTextTag(tag) {
+        
     }
     
     flexed.createRange = function createRange(r, c) { return new Range(r, c); };
