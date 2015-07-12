@@ -158,6 +158,19 @@
             });
         });
         
+        var handle_drop = function(ev) {
+            var re = /~~~REPLACEWITH=(.*)~~~/.exec(body[0].innerHTML);
+            console.log( re );
+            if(re) {
+                var query = re[1];
+                var html = body[0].innerHTML;
+                body[0].innerHTML = html.slice(0, re.index) + '<span id="flexed-replaceme"></span>'
+                                  + html.slice(re.index + re[0].length);
+                var node = $(query, body).detach();
+                $("#flexed-replaceme", body).replaceWith(node);
+            }
+        }
+        
         var update_panels = function(ev) {
             var selection = rangy.getSelection();
             editor.trigger( 'selectionchange.flexed', selection );
@@ -187,6 +200,7 @@
         $(window).on( 'scroll.flexed resize.flexed', update_toolbars );
         body
             .on( 'input.flexed', update_toolbars ) /* TODO keyup, mouseup for old browsers */
+            .on( 'input.flexed', handle_drop )
             .on( 'mouseup.flexed keyup.flexed mouseout.flexed', update_panels );
         update_toolbars();
         
@@ -196,8 +210,10 @@
     $.fn.flexed.defaults = {
         trademark: true,
         toolbarOffset: 0,
-        footerOffset : 0,
+        footerOffset : 0
     };
+    
+    $.fn.flexed.language = "en";
     
     $.fn.flexed.suites = {};
 

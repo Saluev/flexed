@@ -27,6 +27,26 @@
       };
       return result;
     };
+    var image_container_id = 1;
+    var make_image = function(src) {
+        var img = document.createElement('img');
+        img.src = src;
+        img.className = 'flexed-image';
+        var div = document.createElement('div');
+        div.id = "flexed-image-container-" + image_container_id++;
+        div.className = 'flexed-image-container';
+        div.contentEditable = false;
+        div.appendChild(img);
+        var anchor = document.createElement('div');
+        anchor.className = 'flexed-image-anchor';
+        div.appendChild(anchor);
+        img.setAttribute('data-flexed-container-id', div.id);
+        return div;
+    }
+    // binding to all flexed-images ever created
+    $(document).on('dragstart', 'img.flexed-image', null, function(ev) {
+        ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.getAttribute('data-flexed-container-id') + '~~~');
+    });
     
     
     var toolbar = [
@@ -110,6 +130,8 @@
             caption: '<i class="fa fa-image"></i>',
             tooltip: gettext('Image'),
             apply: function apply_image(selection, editor) {
+                var selection = rangy.getSelection();
+                var state = selection.saveRanges();
                 var fd = $.FileDialog({accept: 'image/*'});
                 fd.on('files.bs.filedialog', function(ev) {
                     var files = ev.files;
@@ -117,7 +139,12 @@
                     for(var file_idx in files) {
                         var file = files[file_idx];
                         console.log(file.content);
-                        document.execCommand('insertimage', 0, file.content);
+                        selection.refresh();
+                        selection.restoreRanges(state);
+                        selection.deleteFromDocument();
+                        var range = selection.getRangeAt(0);
+                        var img = make_image(file.content);
+                        range.insertNode(img);
                     }
                 });
             }

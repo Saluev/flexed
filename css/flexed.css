@@ -29,3 +29,25 @@
 li.fixed-tool-button.active {
   text-decoration: underline;
 }
+
+.flexed-image {
+    
+}
+
+.flexed-image-container {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    border: 1px dashed gray;
+}
+
+.flexed-image-anchor {
+    position: absolute;
+    right : -0.5em;
+    bottom: -0.5em;
+    width :  1.0em;
+    height:  1.0em;
+    background: gray;
+    border: 1px solid black;
+    cursor: se-resize;
+}
