@@ -82,21 +82,22 @@
     var make_image = function(src) {
         var img = document.createElement('img');
         img.src = src;
-        img.className = 'flexed-image';
+        img.className = 'flexed-image flexed-contained';
+        img.setAttribute('draggable', false);
         var div = document.createElement('div');
         div.id = "flexed-image-container-" + image_container_id++;
-        div.className = 'flexed-image-container';
+        div.className = 'flexed-image-container flexed-container';
         div.contentEditable = false;
+        div.setAttribute('draggable', true);
         div.appendChild(img);
         var anchor = document.createElement('div');
         anchor.className = 'flexed-image-anchor';
         div.appendChild(anchor);
-        img.setAttribute('data-flexed-container-id', div.id);
         return div;
     }
-    // binding to all flexed-images ever created
-    $(document).on('dragstart', 'img.flexed-image', null, function(ev) {
-        ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.getAttribute('data-flexed-container-id') + '~~~');
+    // binding to all flexed-containers ever created
+    $(document).on('dragstart', '.flexed-container', null, function(ev) {
+          ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.id + '~~~');
     });
     
     

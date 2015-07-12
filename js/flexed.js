@@ -163,10 +163,11 @@
             console.log( re );
             if(re) {
                 var query = re[1];
+                var node = $(query, body).detach();
                 var html = body[0].innerHTML;
+                re = /~~~REPLACEWITH=(.*)~~~/.exec(html);
                 body[0].innerHTML = html.slice(0, re.index) + '<span id="flexed-replaceme"></span>'
                                   + html.slice(re.index + re[0].length);
-                var node = $(query, body).detach();
                 $("#flexed-replaceme", body).replaceWith(node);
             }
         }
