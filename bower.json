@@ -1,0 +1,24 @@
+{
+  "name": "flexed",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Saluev/flexed",
+  "authors": [
+    "Tigran Saluev <tigran.saluev@gmail.com>"
+  ],
+  "description": "Flexible WYSIWYG editor",
+  "main": "js/flexed.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-dialog": "~1.34.5",
+    "bootstrap-file-dialog": "~0.0.1",
+    "rangy": "~1.3.0",
+    "font-awesome": "~4.3.0"
+  }
+}

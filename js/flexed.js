@@ -159,6 +159,13 @@
         });
         
         var handle_drop = function(ev) {
+//             $(".flexed-replaceme", body).replaceWith(function(index) {
+//                 console.log(this);
+//                 var query = this.getAttribute('data-with');
+//                 var node  = $(query, body);
+//                 node.detach();
+//                 return node;
+//             });
             var re = /~~~REPLACEWITH=(.*)~~~/.exec(body[0].innerHTML);
             console.log( re );
             if(re) {
