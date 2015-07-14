@@ -14,42 +14,6 @@
     
     var gettext = window.gettext || function(s) { return s; };
     
-    var apply_template = function(cmd) {
-      var result = function apply(selection) {
-        // TODO case when selection != window.getSelection()
-        document.execCommand(cmd);
-      };
-      return result;
-    };
-    var indicate_template = function(cmd) {
-      var result = function indicate(selection) {
-        return document.queryCommandState(cmd);
-      };
-      return result;
-    };
-    var image_container_id = 1;
-    var make_image = function(src) {
-        var img = document.createElement('img');
-        img.src = src;
-        img.className = 'flexed-image flexed-contained';
-        img.setAttribute('draggable', false);
-        var div = document.createElement('div');
-        div.id = "flexed-image-container-" + image_container_id++;
-        div.className = 'flexed-image-container flexed-container';
-        div.contentEditable = false;
-        div.setAttribute('draggable', true);
-        div.appendChild(img);
-        var anchor = document.createElement('div');
-        anchor.className = 'flexed-image-anchor';
-        div.appendChild(anchor);
-        return div;
-    }
-    // binding to all flexed-containers ever created
-    $(document).on('dragstart', '.flexed-container', null, function(ev) {
-          ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.id + '~~~');
-    });
-    
-    
     var toolbar = [
       [
         {
@@ -66,32 +30,32 @@
             id: 'bold',
             caption: '<i class="fa fa-bold"></i>',
             tooltip: gettext('Bold'),
-            apply: apply_template('bold'),
-            indicate: indicate_template('bold'),
+            apply:    flexed.actions.exec_command ('bold'),
+            indicate: flexed.actions.query_command('bold'),
         },
  
         {
             id: 'italic',
             caption: '<i class="fa fa-italic"></i>',
             tooltip: gettext('Italic'),
-            apply: apply_template('italic'),
-            indicate: indicate_template('italic'),
+            apply:    flexed.actions.exec_command ('italic'),
+            indicate: flexed.actions.query_command('italic'),
         },
         
         {
             id: 'underline',
             caption: '<i class="fa fa-underline"></i>',
             tooltip: gettext('Underline'),
-            apply: apply_template('underline'),
-            indicate: indicate_template('underline'),
+            apply:    flexed.actions.exec_command ('underline'),
+            indicate: flexed.actions.query_command('underline'),
         },
         
         {
             id: 'strikethrough',
             caption: '<i class="fa fa-strikethrough"></i">',
             tooltip: gettext('Strikethrough'),
-            apply: apply_template('strikeThrough'),
-            indicate: indicate_template('strikeThrough'),
+            apply:    flexed.actions.exec_command ('strikeThrough'),
+            indicate: flexed.actions.query_command('strikeThrough'),
         }
       ],
       [
@@ -99,29 +63,29 @@
             id: 'justifyleft',
             caption: '<i class="fa fa-align-left"></i>',
             tooltip: gettext('Align left'),
-            apply: apply_template('justifyLeft'),
-            indicate: indicate_template('justifyLeft'),
+            apply:    flexed.actions.exec_command ('justifyLeft'),
+            indicate: flexed.actions.query_command('justifyLeft'),
         },
         {
             id: 'justifycenter',
             caption: '<i class="fa fa-align-center"></i>',
             tooltip: gettext('Center'),
-            apply: apply_template('justifyCenter'),
-            indicate: indicate_template('justifyCenter'),
+            apply:    flexed.actions.exec_command ('justifyCenter'),
+            indicate: flexed.actions.query_command('justifyCenter'),
         },
         {
             id: 'justifyright',
             caption: '<i class="fa fa-align-right"></i>',
             tooltip: gettext('Align right'),
-            apply: apply_template('justifyRight'),
-            indicate: indicate_template('justifyRight'),
+            apply:    flexed.actions.exec_command ('justifyRight'),
+            indicate: flexed.actions.query_command('justifyRight'),
         },
         {
             id: 'justifyfull',
             caption: '<i class="fa fa-align-justify"></i>',
             tooltip: gettext('Justify'),
-            apply: apply_template('justifyFull'),
-            indicate: indicate_template('justifyFull'),
+            apply:    flexed.actions.exec_command ('justifyFull'),
+            indicate: flexed.actions.query_command('justifyFull'),
         },
         
       ],
@@ -130,30 +94,9 @@
             id: 'image',
             caption: '<i class="fa fa-image"></i>',
             tooltip: gettext('Image'),
-            apply: function apply_image(selection, editor) {
-                var selection = rangy.getSelection();
-                var state = selection.saveRanges();
-                var fd = $.FileDialog({accept: 'image/*'});
-                fd.on('files.bs.filedialog', function(ev) {
-                    var files = ev.files;
-                    editor.body.focus();
-                    for(var file_idx in files) {
-                        var file = files[file_idx];
-                        console.log(file.content);
-                        selection.refresh();
-                        selection.restoreRanges(state);
-                        selection.deleteFromDocument();
-                        var range = selection.getRangeAt(0);
-                        var img = make_image(file.content);
-                        range.insertNode(img);
-                    }
-                });
-            }
-            
-            
-            
+            apply: flexed.actions.insert_image(),
         }
-      ]
+      ],
     ];
     
     var fonts = [

@@ -12,6 +12,13 @@
       console.error('flexed: rangy (http://code.google.com/p/rangy) is required to work');
     }
     
+    var HTML_to_text = function(html) {
+        // probably way faster than $('<div/>').html(html).text()
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        return div.innerText;
+    }
+    
     var create_button = function( button, mode, btn_class ) {
           var bel;
           if(mode == 'toolbar') {
@@ -211,17 +218,156 @@
             .on( 'mouseup.flexed keyup.flexed mouseout.flexed', update_panels );
         update_toolbars();
         
+        // binding to all flexed-containers ever created
+        body.on('dragstart', '.flexed-container', null, function(ev) {
+            ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.id + '~~~');
+        });
+        
         return editor;
     };
     
-    $.fn.flexed.defaults = {
+    var flexed = $.fn.flexed;
+    var gettext = window.gettext || function(s) { return s; };
+    
+    flexed.defaults = {
         trademark: true,
         toolbarOffset: 0,
         footerOffset : 0
     };
     
-    $.fn.flexed.language = "en";
+    flexed.language = "en";
     
-    $.fn.flexed.suites = {};
+    flexed.suites = {};
+    
+    var image_container_id = 1;
+    flexed.api = {
+        // Utility functions used in actions
+        make_image: function(src) {
+            var img = document.createElement('img');
+            img.src = src;
+            img.className = 'flexed-image flexed-contained';
+            img.setAttribute('draggable', false);
+            var div = document.createElement('div');
+            while(document.getElementById("flexed-image-container-" + image_container_id))
+                ++image_container_id;
+            div.id = "flexed-image-container-" + image_container_id++;
+            div.className = 'flexed-image-container flexed-container';
+            div.contentEditable = false;
+            div.setAttribute('draggable', true);
+            div.appendChild(img);
+            var anchor = document.createElement('div');
+            anchor.className = 'flexed-image-anchor';
+            div.appendChild(anchor);
+            return div;
+        }
+    };
+    
+    flexed.actions = {
+        // Simple actions based on browser capabilities (e.g. bold, italic, etc.)
+        exec_command: function(cmd) {
+            return function(selection, editor) {
+                document.execCommand(cmd);
+            }
+        },
+        query_command: function(cmd) {
+            return function(selection, editor) {
+                return document.queryCommandState(cmd);
+            }
+        },
+        // More complicated text actions
+        insert_symbol: function(symbol) {
+            return function(selection, editor) {
+                // to replace selection with symbol, first clean it
+                selection.deleteFromDocument();
+                // update selection object state
+                selection.refresh();
+                // now it must have only one range representing the caret
+                var range = selection.getRangeAt(0);
+                // create text node and insert it at the caret position
+                symbol = HTML_to_text(symbol);
+                var node = document.createTextNode(symbol);
+                range.insertNode(node);
+                // now set caret AFTER the inserted symbol
+                var new_range = rangy.createRangyRange();
+                new_range.setStart(range.startContainer, range.startOffset + 1);
+                new_range.setEnd  (range.startContainer, range.startOffset + 1);
+                selection.setSingleRange(new_range);
+            };
+        },
+        wrap_with: function(oquote, cquote) {
+            oquote = HTML_to_text(oquote);
+            cquote = HTML_to_text(cquote);
+            return function(selection, editor) {
+                var range1 = selection.getRangeAt(0);
+                var range2 = range1.cloneRange();
+                range2.collapse(false); // to the end
+                var collapsed = range1.collapsed;
+                var newStartContainer = range1.startContainer;
+                var newEndContainer   = range1.endContainer;
+                var newStartOffset    = range1.startOffset;
+                var newEndOffset      = range1.endOffset;
+                if(newStartContainer.nodeType == newStartContainer.TEXT_NODE) {
+                    // just inserting text
+                    newStartContainer.textContent = 
+                        newStartContainer.textContent.slice(0, newStartOffset) + oquote +
+                        newStartContainer.textContent.slice(newStartOffset);
+                    newStartOffset += oquote.length;
+                    if(newStartContainer == newEndContainer)
+                        newEndOffset += oquote.length;
+                } else {
+                    // inserting new text node
+                    range1.insertNode(document.createTextNode(oquote));
+                    if(newStartContainer == newEndContainer)
+                        newEndOffset += 1;
+                }
+                if(newEndContainer.nodeType == newEndContainer.TEXT_NODE) {
+                    // just inserting text
+                    newEndContainer.textContent = 
+                        newEndContainer.textContent.slice(0, newEndOffset) + cquote +
+                        newEndContainer.textContent.slice(newEndOffset);
+                } else {
+                    // inserting new text node
+                    range2.insertNode(document.createTextNode(cquote));
+                }
+                var new_range = rangy.createRangyRange();
+                new_range.setStart(newStartContainer, newStartOffset);
+                new_range.setEnd  (newEndContainer,   newEndOffset  );
+                selection.setSingleRange(new_range);
+            };
+        },
+        wrap_with_quotes: function(options) {
+            return function(selection, editor) {
+                var oquote = '&quot;', cquote = '&quot;';
+                // TODO implement rules for other languages
+                if(flexed.language == 'ru') {
+                    oquote = '&laquo;';
+                    cquote = '&raquo;';
+                }
+                return flexed.actions.wrap_with(oquote, cquote)(selection, editor);
+            };
+        },
+        // Images and other elements
+        insert_image: function(options) {
+            return function(selection, editor) {
+                var state = selection.saveRanges();
+                var fd = $.FileDialog({accept: 'image/*'});
+                fd.on('files.bs.filedialog', function(ev) {
+                    var files = ev.files;
+                    editor.body.focus();
+                    for(var file_idx in files) {
+                        var file = files[file_idx];
+                        selection.refresh();
+                        selection.restoreRanges(state);
+                        selection.deleteFromDocument();
+                        var range = selection.getRangeAt(0);
+                        var img = flexed.api.make_image(file.content);
+                        range.insertNode(img);
+                    }
+                });
+            };
+        }
+        
+    };
+    
 
 })(window.jQuery, window.rangy);
