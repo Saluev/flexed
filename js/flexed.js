@@ -221,6 +221,8 @@
         // binding to all flexed-containers ever created
         body.on('dragstart', '.flexed-container', null, function(ev) {
             ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.id + '~~~');
+        }).on('click', '.flexed-image', null, function(ev) {
+            $.fn.flexed.api.image_dialog(this);
         });
         
         return editor;
@@ -259,6 +261,77 @@
             anchor.className = 'flexed-image-anchor';
             div.appendChild(anchor);
             return div;
+        },
+        image_dialog: function(img) {
+            var width  = $(img).width (),
+                height = $(img).height();
+            var form = [
+                '<form class="form-horizontal">',
+                '<fieldset>',
+
+                '<!-- Image description -->',
+                '<div class="form-group">',
+                '  <label class="col-md-4 control-label" for="alt">Image description</label>',
+                '  <div class="col-md-6">',
+                '  <input id="alt" name="alt" type="text" placeholder="describe image here"',
+                '         class="form-control input-md" value="' + (img.getAttribute('alt') || '') + '"/>',
+                '  </div>',
+                '</div>',
+
+                '<!-- Width and height -->',
+                '<div class="form-group">',
+                '  <label class="col-md-4 control-label" for="width">Width</label>',
+                '  <div class="col-md-2">',
+                '      <input id="width" name="width" type="text" placeholder="in px"',
+                '             class="form-control input-md" value="' + width + '"/>',
+                '  </div>',
+                '  <label class="col-md-2 control-label" for="height">Height</label>',
+                '  <div class="col-md-2">',
+                '      <input id="height" name="height" type="text" placeholder="in px"',
+                '             class="form-control input-md" value="' + height + '"/>',
+                '  </div>',
+                '</div>',
+
+                '<!-- Image source -->',
+                '<div class="form-group">',
+                '  <label class="col-md-4 control-label" for="src">Source</label>',
+                '  <div class="col-md-6">',
+                '  <input id="src" name="src" type="text" placeholder="http://"',
+                '         class="form-control input-md" value="' + img.src + '"/>',
+                '  </div>',
+                '</div>',
+
+                '</fieldset>',
+                '</form>'].join("\n");
+            BootstrapDialog.show({
+                message: $(form),
+                title: gettext('Image properties'),
+                buttons: [
+                    {
+                        icon: 'glyphicon glyphicon-ok',
+                        label: gettext('Save'),
+                        cssClass: 'btn-primary',
+                        action: function(dialogItself){
+                            var form = dialogItself.$modalContent;
+                            img.setAttribute('alt', $('#alt', form).val());
+                            var new_width  = $('#width',  form).val(),
+                                new_height = $('#height', form).val();
+                            if(width  != new_width ) $(img).css('width',  new_width );
+                            if(height != new_height) $(img).css('height', new_height);
+                            img.src = $('#src', form).val();
+                            dialogItself.close();
+                        }
+                    },
+                    {
+                        icon: 'glyphicon glyphicon-ban-circle',
+                        label: gettext('Cancel'),
+                        cssClass: 'btn-danger',
+                        action: function(dialogItself){
+                            dialogItself.close();
+                        }
+                    }
+                ]
+            });
         }
     };
     
