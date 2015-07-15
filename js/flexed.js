@@ -258,7 +258,7 @@
             div.setAttribute('draggable', true);
             div.appendChild(img);
             var anchor = document.createElement('div');
-            anchor.className = 'flexed-image-anchor';
+            anchor.className = 'flexed-image-anchor fa fa-expand fa-flip-horizontal fa-lg';
             div.appendChild(anchor);
             return div;
         },
@@ -321,7 +321,7 @@
                 title: gettext('Image properties'),
                 buttons: [
                     {
-                        icon: 'glyphicon glyphicon-ok',
+                        icon: 'fa fa-check',
                         label: gettext('Save'),
                         cssClass: 'btn-primary',
                         action: function(dialogItself){
@@ -342,7 +342,7 @@
                         }
                     },
                     {
-                        icon: 'glyphicon glyphicon-ban-circle',
+                        icon: 'fa fa-times',
                         label: gettext('Cancel'),
                         cssClass: 'btn-danger',
                         action: function(dialogItself){
