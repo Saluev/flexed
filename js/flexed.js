@@ -328,9 +328,9 @@
                 '<label class="col-md-4 control-label" for="float">Positioning</label>',
                 '<div class="col-md-6">',
                 '    <select id="float" name="float" class="form-control">',
-                '    <option value="none"'  + (float == 'none'  ? ' selected' : '') + '>In text</option>',
-                '    <option value="left"'  + (float == 'left'  ? ' selected' : '') + '>Floating on the left</option>',
-                '    <option value="right"' + (float == 'right' ? ' selected' : '') + '>Floating on the right</option>',
+                '       <option value="none"'  + (float == 'none'  ? ' selected' : '') + '>In text</option>',
+                '       <option value="left"'  + (float == 'left'  ? ' selected' : '') + '>Floating on the left</option>',
+                '       <option value="right"' + (float == 'right' ? ' selected' : '') + '>Floating on the right</option>',
                 '    </select>',
                 '</div>',
                 '</div>',
@@ -381,7 +381,76 @@
                     }
                 ]
             });
-        }
+        },
+        link_dialog: function(link, options) {
+            var href   = link.href,
+                target = link.target,
+                title  = link.getAttribute('title') || '';
+            var form = [
+                '<form class="form-horizontal">',
+                '<fieldset>',
+
+                '<!-- URL -->',
+                '<div class="form-group">',
+                '<label class="col-md-4 control-label" for="href">URL</label>',
+                '<div class="col-md-6">',
+                '<input id="href" name="href" type="text" placeholder="http://"',
+                '       class="form-control input-md" value="' + href + '"/>',
+                '</div>',
+                '</div>',
+
+                '<!-- Title -->',
+                '<div class="form-group">',
+                '<label class="col-md-4 control-label" for="title">Tooltip</label>',
+                '<div class="col-md-6">',
+                '<input id="title" name="title" type="text" placeholder="describe link here"',
+                '       class="form-control input-md" value="' + title + '"/>',
+                '</div>',
+                '</div>',
+
+                '<!-- Target -->',
+                '<div class="form-group">',
+                '<label class="col-md-4 control-label" for="target">Behavior</label>',
+                '<div class="col-md-6">',
+                '    <select id="target" name="target" class="form-control">',
+                '       <option value="_self" ' + (target == '_self'  ? ' selected' : '') + '>Open in the same window / tab</option>',
+                '       <option value="_blank"' + (target == '_blank' ? ' selected' : '') + '>Open in a new window / tab</option>',
+                '    </select>',
+                '</div>',
+                '</div>',
+
+                '</fieldset>',
+                '</form>',
+            ].join("\n");
+            BootstrapDialog.show({
+                message: $(form),
+                title: gettext('Link properties'),
+                buttons: [
+                    {
+                        icon: 'fa fa-check',
+                        label: gettext('Save'),
+                        cssClass: 'btn-primary',
+                        action: function(dialogItself){
+                            var form = dialogItself.$modalContent;
+                            link.href   = $('#href',   form).val();
+                            link.target = $('#target', form).val();
+                            link.setAttribute('title', $('#title', form).val());
+                            dialogItself.close();
+                            if(options && options.success) options.success();
+                        }
+                    },
+                    {
+                        icon: 'fa fa-times',
+                        label: gettext('Cancel'),
+                        cssClass: 'btn-danger',
+                        action: function(dialogItself){
+                            dialogItself.close();
+                            if(options && options.cancel) options.cancel();
+                        }
+                    }
+                ]
+            });
+        },
     };
     
     flexed.actions = {
@@ -487,7 +556,28 @@
                     }
                 });
             };
-        }
+        },
+        insert_link: function(options) {
+            return function(selection, editor) {
+                var state = selection.saveRanges();
+                var link = document.createElement('a');
+                flexed.api.link_dialog(link, {success: function() {
+                    selection.refresh();
+                    selection.restoreRanges(state);
+                    for(var i = 0; i < selection.rangeCount; ++i) {
+                        var range = selection.getRangeAt(i);
+                        if(range.canSurroundContents())
+                            range.surroundContents($(link).clone()[0]);
+                        else {
+                            // TODO
+                        }
+                    }
+                }, cancel: function() {
+                    selection.refresh();
+                    selection.restoreRanges(state);
+                }});
+            }
+        },
         
     };
     
@@ -515,10 +605,17 @@
         },
         strikethrough: {
             id: 'strikethrough',
-            caption: '<i class="fa fa-strikethrough"></i">',
+            caption: '<i class="fa fa-strikethrough"></i>',
             tooltip: gettext('Strikethrough'),
             apply:    flexed.actions.exec_command ('strikeThrough'),
             indicate: flexed.actions.query_command('strikeThrough'),
+        },
+        link: {
+            id: 'link',
+            caption: '<i class="fa fa-link"></i>',
+            tooltip: gettext('Link'),
+            apply:    flexed.actions.insert_link(),
+//             indicate: flexed.actions.indicate_link // TODO
         },
         justifyleft: {
             id: 'justifyleft',

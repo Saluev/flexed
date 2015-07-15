@@ -30,6 +30,7 @@
         flexed.buttons.italic,
         flexed.buttons.underline,
         flexed.buttons.strikethrough,
+        flexed.buttons.link,
       ],
       [
         flexed.buttons.justifyleft,
