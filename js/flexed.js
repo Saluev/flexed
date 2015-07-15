@@ -264,7 +264,8 @@
         },
         image_dialog: function(img) {
             var width  = $(img).width (),
-                height = $(img).height();
+                height = $(img).height(),
+                float  = $(img).css('float');
             var form = [
                 '<form class="form-horizontal">',
                 '<fieldset>',
@@ -292,6 +293,18 @@
                 '  </div>',
                 '</div>',
 
+                '<!-- Floating -->',
+                '<div class="form-group">',
+                '<label class="col-md-4 control-label" for="float">Positioning</label>',
+                '<div class="col-md-6">',
+                '    <select id="float" name="float" class="form-control">',
+                '    <option value="none"'  + (float == 'none'  ? ' selected' : '') + '>In text</option>',
+                '    <option value="left"'  + (float == 'left'  ? ' selected' : '') + '>Floating on the left</option>',
+                '    <option value="right"' + (float == 'right' ? ' selected' : '') + '>Floating on the right</option>',
+                '    </select>',
+                '</div>',
+                '</div>',
+ 
                 '<!-- Image source -->',
                 '<div class="form-group">',
                 '  <label class="col-md-4 control-label" for="src">Source</label>',
@@ -315,9 +328,15 @@
                             var form = dialogItself.$modalContent;
                             img.setAttribute('alt', $('#alt', form).val());
                             var new_width  = $('#width',  form).val(),
-                                new_height = $('#height', form).val();
-                            if(width  != new_width ) $(img).css('width',  new_width );
-                            if(height != new_height) $(img).css('height', new_height);
+                                new_height = $('#height', form).val(),
+                                new_float  = $('#float',  form).val();
+                            if(width  != new_width
+                            || height != new_height)
+                                $(img).css({width: new_width, height: new_height});
+                            if(float  != new_float) {
+                                $(img).css('float', new_float);
+                                $(img).closest(".flexed-container").css('float', new_float);
+                            }
                             img.src = $('#src', form).val();
                             dialogItself.close();
                         }
