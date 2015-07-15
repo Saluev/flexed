@@ -43,9 +43,10 @@ li.fixed-tool-button.active {
 
 .flexed-image-anchor {
     position: absolute;
-    right : -0.25em;
-    bottom: -0.25em;
-    background: white;
-    color: gray;
-    cursor: se-resize;
+    right : -0.5em;
+    bottom: -0.5em;
+    width :  1.0em;
+    height:  1.0em;
+    background: gray;
+    border: 1px solid black;
 }

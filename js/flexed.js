@@ -147,7 +147,7 @@
         
         $(".flexed-action-button", editor).on( 'click.flexed', function() {
             var action = this.button;
-            editor.trigger( 'flexed.' + action.id );
+            editor.trigger( 'flexed.' + action.id, [editor.get_html()] );
             this.blur();
         }).addClass(function() {
             return 'flexed-action-' + this.button.id;
@@ -218,6 +218,16 @@
             .on( 'mouseup.flexed keyup.flexed mouseout.flexed', update_panels );
         update_toolbars();
         
+        editor.get_html = function() {
+            return $.fn.flexed.api.get_html(editor);
+        };
+        editor.set_html = function(html) {
+            return $.fn.flexed.api.set_html(editor, html);
+        }
+        
+        /* Wrapping objects in containers */
+        editor.set_html(body.html());
+        
         // binding to all flexed-containers ever created
         body.on('dragstart', '.flexed-container', null, function(ev) {
             ev.originalEvent.dataTransfer.setData('text/html', '~~~REPLACEWITH=#' + this.id + '~~~');
@@ -243,11 +253,25 @@
     
     var image_container_id = 1;
     flexed.api = {
+        // Just necessary functions
+        set_html: function(editor, html) {
+            var body = editor.body;
+            body.html(html);
+            $("img", body).each(function(index) {
+                $(this).replaceWith(flexed.api.wrap_image($(this).clone()[0]));
+            });
+        },
+        get_html: function(editor) {
+            var body = editor.body.clone();
+            $(".flexed-container", body).each(function(idx) {
+                var contained = $(".flexed-contained", this).detach();
+                $(this).replaceWith(contained);
+            });
+            return body.html();
+        },
         // Utility functions used in actions
-        make_image: function(src) {
-            var img = document.createElement('img');
-            img.src = src;
-            img.className = 'flexed-image flexed-contained';
+        wrap_image: function(img) {
+            img.className += ' flexed-image flexed-contained';
             img.setAttribute('draggable', false);
             var div = document.createElement('div');
             while(document.getElementById("flexed-image-container-" + image_container_id))
@@ -257,10 +281,16 @@
             div.contentEditable = false;
             div.setAttribute('draggable', true);
             div.appendChild(img);
+            div.style.float = img.style.float;
             var anchor = document.createElement('div');
-            anchor.className = 'flexed-image-anchor fa fa-expand fa-flip-horizontal fa-lg';
+            anchor.className = 'flexed-image-anchor';
             div.appendChild(anchor);
             return div;
+        },
+        make_image: function(src) {
+            var img = document.createElement('img');
+            img.src = src;
+            return flexed.api.wrap_image(img);
         },
         image_dialog: function(img) {
             var width  = $(img).width (),
