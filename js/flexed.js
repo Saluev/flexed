@@ -153,11 +153,12 @@
             return 'flexed-action-' + this.button.id;
         });
         
-        editor.on( 'selectionchange.flexed', function(selection) {
+        editor.on( 'selectionchange.flexed', function(ev) {
+            var selection = rangy.getSelection();
             $(".flexed-tool-button", editor).each(function(idx, el) {
                 var button = el.button;
-                if( !button.indicate ) return;
-                     var indication = button.indicate(selection);
+                if( !button.indicate || selection.rangeCount == 0 ) return;
+                var indication = button.indicate(selection, editor);
                 if( indication )
                   button.element.addClass   ( 'active' );
                 else
@@ -422,10 +423,7 @@
                 '</fieldset>',
                 '</form>',
             ].join("\n");
-            BootstrapDialog.show({
-                message: $(form),
-                title: gettext('Link properties'),
-                buttons: [
+            var buttons = [
                     {
                         icon: 'fa fa-check',
                         label: gettext('Save'),
@@ -448,7 +446,23 @@
                             if(options && options.cancel) options.cancel();
                         }
                     }
-                ]
+            ];
+            if( options && options.remove ) {
+                buttons.splice(1, 0, {
+                    icon: 'fa fa-trash',
+                    label: gettext('Remove'),
+                    cssClass: 'btn-warning',
+                    action: function(dialogItself) {
+                        dialogItself.close();
+                        options.remove();
+                    }
+                });
+            }
+            
+            BootstrapDialog.show({
+                message: $(form),
+                title: gettext('Link properties'),
+                buttons: buttons,
             });
         },
     };
@@ -560,7 +574,17 @@
         insert_link: function(options) {
             return function(selection, editor) {
                 var state = selection.saveRanges();
-                var link = document.createElement('a');
+                var link = flexed.actions.indicate_link(selection, editor);
+                var remove_callback;
+                if( link ) {
+                    remove_callback = function() {
+                        var contents = $(link).contents();
+                        $(link).replaceWith(contents);
+                    }
+                } else {
+                    link = document.createElement('a');
+                    remove_callback = false;
+                }
                 flexed.api.link_dialog(link, {success: function() {
                     selection.refresh();
                     selection.restoreRanges(state);
@@ -575,9 +599,15 @@
                 }, cancel: function() {
                     selection.refresh();
                     selection.restoreRanges(state);
-                }});
-            }
+                }, remove: remove_callback});
+            };
         },
+        indicate_link: function(selection, editor) {
+                var range = selection.getRangeAt(0);
+                var container = range.commonAncestorContainer;
+                var link = $(container).closest('a');
+                return link[0] || false;
+        }
         
     };
     
@@ -615,7 +645,7 @@
             caption: '<i class="fa fa-link"></i>',
             tooltip: gettext('Link'),
             apply:    flexed.actions.insert_link(),
-//             indicate: flexed.actions.indicate_link // TODO
+            indicate: flexed.actions.indicate_link,
         },
         justifyleft: {
             id: 'justifyleft',
