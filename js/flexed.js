@@ -340,7 +340,7 @@
                 '  <label class="col-md-4 control-label" for="src">Source</label>',
                 '  <div class="col-md-6">',
                 '  <input id="src" name="src" type="text" placeholder="http://"',
-                '         class="form-control input-md" value="' + img.src + '"/>',
+                '         class="form-control input-md" value="' + img.getAttribute('src') + '"/>',
                 '  </div>',
                 '</div>',
 
@@ -365,9 +365,9 @@
                                 $(img).css({width: new_width, height: new_height});
                             if(float  != new_float) {
                                 $(img).css('float', new_float);
-                                $(img).closest(".flexed-container").css('float', new_float);
+                                $(img).closest('.flexed-container').css('float', new_float);
                             }
-                            img.src = $('#src', form).val();
+                            img.setAttribute('src', $('#src', form).val());
                             dialogItself.close();
                         }
                     },
