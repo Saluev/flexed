@@ -252,7 +252,7 @@
     
     flexed.suites = {};
     
-    var image_container_id = 1;
+    var container_id = 1;
     flexed.api = {
         // Just necessary functions
         set_html: function(editor, html) {
@@ -275,9 +275,9 @@
             img.className += ' flexed-image flexed-contained';
             img.setAttribute('draggable', false);
             var div = document.createElement('div');
-            while(document.getElementById("flexed-image-container-" + image_container_id))
-                ++image_container_id;
-            div.id = "flexed-image-container-" + image_container_id++;
+            while(document.getElementById("flexed-image-container-" + container_id))
+                ++container_id;
+            div.id = "flexed-image-container-" + container_id++;
             div.className = 'flexed-image-container flexed-container';
             div.contentEditable = false;
             div.setAttribute('draggable', true);
@@ -292,6 +292,22 @@
             var img = document.createElement('img');
             img.src = src;
             return flexed.api.wrap_image(img);
+        },
+        wrap_line: function(line) {
+            line.className += ' flexed-line flexed-contained';
+            var div = document.createElement('div');
+            while(document.getElementById("flexed-image-container-" + container_id))
+                ++container_id;
+            div.id = "flexed-line-container-" + container_id++;
+            div.className = 'flexed-line-container flexed-container';
+            div.contentEditable = false;
+            div.setAttribute('draggable', true);
+            div.appendChild(line);
+            return div;
+        },
+        make_line: function() {
+            var line = document.createElement('hr');
+            return flexed.api.wrap_line(line);
         },
         image_dialog: function(img) {
             var width  = $(img).width (),
@@ -571,6 +587,14 @@
                 });
             };
         },
+        insert_line: function(options) {
+            return function(selection, editor) {
+                selection.deleteFromDocument();
+                var range = selection.getRangeAt(0);
+                var line = flexed.api.make_line();
+                range.insertNode(line);
+            }
+        },
         insert_link: function(options) {
             return function(selection, editor) {
                 var state = selection.saveRanges();
@@ -680,6 +704,12 @@
             caption: '<i class="fa fa-image"></i>',
             tooltip: gettext('Image'),
             apply: flexed.actions.insert_image(),
+        },
+        line: {
+            id: 'line',
+            caption: '&mdash;',
+            tooltip: gettext('Horizontal rule'),
+            apply: flexed.actions.insert_line(),
         },
         wrap_with_quotes: {
             id: 'wrap_with_quotes',

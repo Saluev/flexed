@@ -34,11 +34,14 @@ li.fixed-tool-button.active {
     
 }
 
+.flexed-container {
+    cursor: pointer;
+    border: 2px dashed gray;
+}
+
 .flexed-image-container {
     display: inline-block;
     position: relative;
-    cursor: pointer;
-    border: 2px dashed gray;
 }
 
 .flexed-image-anchor {

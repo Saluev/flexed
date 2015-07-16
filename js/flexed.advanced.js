@@ -40,6 +40,7 @@
       ],
       [
         flexed.buttons.image,
+        flexed.buttons.line,
       ],
     ];
     
